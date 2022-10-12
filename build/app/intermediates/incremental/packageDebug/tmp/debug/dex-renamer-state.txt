@@ -1,0 +1,4 @@
+#Fri Sep 16 20:07:37 JST 2022
+base.0=C\:\\Users\\babut\\AndroidStudioProjects\\cellid\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

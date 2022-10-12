@@ -1,0 +1,24 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.chizi.carrier_info" >
+4
+5    <uses-sdk
+6        android:minSdkVersion="16"
+6-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml
+7        android:targetSdkVersion="16" />
+7-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml
+8
+9    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+9-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml:2:3-73
+9-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml:2:20-70
+10    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+10-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml:3:3-77
+10-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml:3:20-74
+11    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+11-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml:4:3-79
+11-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml:4:20-76
+12    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+12-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml:5:3-77
+12-->C:\src\flutter\flutter\.pub-cache\hosted\pub.dartlang.org\carrier_info-2.0.5\android\src\main\AndroidManifest.xml:5:20-74
+13
+14</manifest>
