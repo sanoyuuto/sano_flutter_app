@@ -1,16 +1,16 @@
-# cellid
+# Flutterを用いたスループットデータ収集用のアプリケーション
+## 使い方説明
+#### ①緑の測定開始ボタンを押す<br>
+#### ②240秒経過すると測定が完了する<br>
+#### ③保存するファイル名を入力する<br>
+#### ④グレーのデータ保存ボタンを押す<br>
+#### ⑤保存が完了するとファイルが保存されていることを確認できます(画像２)<br>
+#### ⑥それぞれの時間におけるスループットを計測出来ていることを確認できます(画像３)<br>
+## 画像1
+<img src="https://github.com/sanoyuuto/sano_flutter/blob/master/screen4.jpg" width="50%" /><br>
 
-A new Flutter project.
+## 画像2
+<img src="https://github.com/sanoyuuto/sano_flutter/blob/master/screen2.jpg" width="50%" /><br>
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 画像3
+<img src="https://github.com/sanoyuuto/sano_flutter/blob/master/screen3.jpg" width="50%" />
