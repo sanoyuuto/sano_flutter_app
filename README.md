@@ -7,7 +7,7 @@
 #### ⑤保存が完了するとファイルが保存されていることを確認できます(画像２)<br>
 #### ⑥それぞれの時間におけるスループットを計測出来ていることを確認できます(画像３)<br>
 ## 画像1
-<img src="https://github.com/sanoyuuto/sano_flutter/blob/master/screen1.jpg" width="50%" /><br>
+<img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/screen1.jpg" width="50%" /><br>
 
 ## 画像2
 <img src="https://github.com/sanoyuuto/sano_flutter/blob/master/screen2.jpg" width="50%" /><br>
