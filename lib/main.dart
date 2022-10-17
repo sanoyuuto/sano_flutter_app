@@ -9,8 +9,8 @@ import 'package:carrier_info/carrier_info.dart';
 import 'package:geolocator/geolocator.dart';
 import 'map.dart';
 
-const imgUrl ="https://cdn.paperm.jp/image/freeillust/xmas_195.png"; //1.3MB
-const T= 300;//何秒ダウンロードするか
+const imgUrl ="set your url"; 
+const T= ;//スループット計測時間するか
 var dio = Dio();
 const NUM = 1;
 
