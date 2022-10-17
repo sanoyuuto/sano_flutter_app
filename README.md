@@ -17,7 +17,5 @@
 <img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/screen3.jpg" width="50%" />
 
 ## 画像4
-プライバシー保護のためぼかしております。
+プライバシー保護のため、ぼかしております。<br>
 <img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/screen4.jpg" width="50%" />
-
-
