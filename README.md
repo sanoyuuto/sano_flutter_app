@@ -7,6 +7,7 @@
 #### ⑤保存が完了するとファイルが保存されていることを確認できます(画像２)<br>
 #### ⑥それぞれの時間におけるスループットを計測出来ていることを確認できます(画像３)<br>
 ## 画像1
+プライバシー保護のため緯度、経度、セルIDは隠しております。
 <img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/screen1.jpg" width="50%" /><br>
 
 ## 画像2
