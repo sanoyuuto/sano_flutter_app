@@ -1,16 +1,22 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter/services.dart';
 import 'package:dio/dio.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:external_path/external_path.dart';
 import 'package:carrier_info/carrier_info.dart';
 import 'package:geolocator/geolocator.dart';
 import 'map.dart';
+import 'package:nr_cellinfo/cellResponse.dart';
+import 'package:nr_cellinfo/simInfoResponse.dart';
+import 'package:nr_cellinfo/nr_cellinfo.dart';
+import 'package:nr_cellinfo/models/common/cell_type.dart';
 
-const imgUrl ="set your url"; 
-const T= ;//スループット計測時間するか
+const imgUrl ="your server URL"; 
+const T= 200;//何秒ダウンロードするか
 var dio = Dio();
 const NUM = 1;
 
@@ -58,19 +64,24 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
   Stopwatch s=Stopwatch();//時間の計測を行う
   var dataset={}; //時間(s)と帯域(Mbps)を保存する関数
   List<double> dataList = [];
+  List<double> dataListNeighbor = [];
+  List<int> dataListNeighborLength = [];
   int firstTime=0;
   var filename= "null";
   double timecount = 0;
   var CellId = "Null";
   String Latitude = "Null";
   String Longitude = "Null";
+  double RSSI = 0;
+  double RSRP = 0;
+  double SINR = 0;
 
   // androidアプリのフォルダにアクセスを許可する関数
   void getPermission() async {
     print("getPermission");
     await [Permission.storage].request();
   }
-
+  CellsResponse? _cellsResponse;
   @override
   void initState() {
     getPermission();
@@ -82,6 +93,7 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
     formattedDate = DateFormat('yyyy-MM-dd-kk:mm:ss:SSS').format(time);//String型に変換
     return formattedDate;
   }
+  String currentDBM = "";
 
   Future<Position> _determinePosition() async {
     bool serviceEnabled;
@@ -146,8 +158,26 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
     return (s.elapsedMilliseconds);
   }
 
+  getNeighbor() async {
+    CellsResponse? cellsResponse;
+    String platformVersion = (await NrCellinfo.getCellInfo) ?? "";
+    final body = json.decode(platformVersion);
+    cellsResponse = CellsResponse.fromJson(body);
+    int? neighbor = cellsResponse.neighboringCellList?.length;
+    //print(neighbor);
+    dataListNeighborLength.add(neighbor!);
+    for(int i = 0; i < neighbor; i++) {
+      CellType currentCellInFirstChipNeighbor = cellsResponse.neighboringCellList![i];
+      dataListNeighbor.add(currentCellInFirstChipNeighbor.lte!.signalLTE!.rssi!.toDouble());
+      dataListNeighbor.add(currentCellInFirstChipNeighbor.lte!.signalLTE!.rsrp!.toDouble());
+      //dataListNeighbor.add(currentCellInFirstChipNeighbor.lte!.signalLTE!.snr!.toDouble());
+    }
+  }
+
   //求めたスループットを保存する関数
-  repetition() async{
+  repetition(fileName) async{
+    dataListNeighbor.clear();
+    dataListNeighborLength.clear();
     dataList.clear();
     start_stopwatch();
     await download2(dio,imgUrl);
@@ -163,10 +193,41 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
     keido = ((keido*10000).floor())/10000;//(小数点4桁)
     Latitude = ido.toString();
     Longitude = keido.toString();
+    //通信品質を求める
+    CellsResponse? cellsResponse;
+    try {
+      String platformVersion = (await NrCellinfo.getCellInfo) ?? "";
+      final body = json.decode(platformVersion);
+      cellsResponse = CellsResponse.fromJson(body);
+      CellType currentCellInFirstChip = cellsResponse.primaryCellList![0];
+      RSSI = currentCellInFirstChip.lte!.signalLTE!.rssi!.toDouble();
+      RSRP = currentCellInFirstChip.lte!.signalLTE!.rsrp!.toDouble();
+      SINR = currentCellInFirstChip.lte!.signalLTE!.snr!.toDouble();
+      if (currentCellInFirstChip.type == "LT  E") {
+        currentDBM = "LTE dbm = " +
+            currentCellInFirstChip.lte!.signalLTE!.dbm.toString();
+      } else if (currentCellInFirstChip.type == "NR") {
+        currentDBM =
+            "NR dbm = " + currentCellInFirstChip.nr!.signalNR!.dbm.toString();
+      } else if (currentCellInFirstChip.type == "WCDMA") {
+        currentDBM = "WCDMA dbm = " +
+            currentCellInFirstChip.wcdma!.signalWCDMA!.dbm.toString();
+        //print('currentDBM = ' + currentDBM);
+      }
+    } on PlatformException {
+      _cellsResponse = null;
+    }
+
+    dataListNeighbor.add(0.00);
+    getNeighbor();
     dataset[0.00]='$throughput';
     dataList.add(0.00);
     dataList.add(throughput);
     dataList.add(cid);
+    dataList.add(RSSI);
+    dataList.add(RSRP);
+    dataList.add(SINR);
+
     for (int i = 0; i < 100000; i++) {
       int j = 0;
       await download2(dio, imgUrl);
@@ -183,10 +244,43 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
         s.reset();
         break;
       }
+      //RSRPを求める
+      CellsResponse? cellsResponse;
+      try {
+        String platformVersion = (await NrCellinfo.getCellInfo) ?? "";
+        final body = json.decode(platformVersion);
+        cellsResponse = CellsResponse.fromJson(body);
+        CellType currentCellInFirstChip = cellsResponse.primaryCellList![0];
+        RSSI = currentCellInFirstChip.lte!.signalLTE!.rssi!.toDouble();
+        RSRP = currentCellInFirstChip.lte!.signalLTE!.rsrp!.toDouble();
+        SINR = currentCellInFirstChip.lte!.signalLTE!.snr!.toDouble();
+        if (currentCellInFirstChip.type == "LT  E") {
+          currentDBM = "LTE dbm = " +
+              currentCellInFirstChip.lte!.signalLTE!.dbm.toString();
+        } else if (currentCellInFirstChip.type == "NR") {
+          currentDBM =
+              "NR dbm = " + currentCellInFirstChip.nr!.signalNR!.dbm.toString();
+        } else if (currentCellInFirstChip.type == "WCDMA") {
+          currentDBM = "WCDMA dbm = " +
+              currentCellInFirstChip.wcdma!.signalWCDMA!.dbm.toString();
+          //print('currentDBM = ' + currentDBM);
+        }
+      } on PlatformException {
+        _cellsResponse = null;
+      }
+      if (!mounted) return;
+      setState(() {
+        _cellsResponse = cellsResponse;
+      });
+      dataListNeighbor.add(x);
+      getNeighbor();
       dataset[x] = '$throughput';
       dataList.add(x);
       dataList.add(throughput);
       dataList.add(cid2);
+      dataList.add(RSSI);
+      dataList.add(RSRP);
+      dataList.add(SINR);
       //緯度と経度を求める
       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       double ido = position.latitude.toDouble();
@@ -209,19 +303,54 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
 
   //ログファイルを作成しandroidに保存
   Future<void>  makeTxt(myFile) async{
+    String results = "";
+    for (var i = 0; i < dataList.length/6; i++) {
+      double A = dataList.elementAt(6*i);
+      results += "$A   ";
+      double B = dataList.elementAt(6*i+1);
+      results += "$B   ";
+      double C = dataList.elementAt(6*i+2);
+      int D = C.toInt();
+      results += "$D   ";
+      double E = dataList.elementAt(6*i+3);
+      results += "$E   ";
+      double F = dataList.elementAt(6*i+4);
+      results += "$F   ";
+      double H = dataList.elementAt(6*i+5);
+      results += "$H   ";
+      //raf.writeStringSync('$results\n');
+      results +="\n";
+    }
     String logDirectory = await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS);
-    //String logDirectory = "/data/data/com.example.flutter_app/app_flutter";
     String logPath = '${logDirectory}/$myFile';
     File textFilePath = File(logPath);
     print('$logPath');
     var raf = textFilePath.openSync(mode: FileMode.write);
-    for (var i = 0; i < dataList.length/3; i++) {
-      double A = dataList.elementAt(3*i);
-      double B = dataList.elementAt(3*i+1);
-      double C = dataList.elementAt(3*i+2);
-      int D = C.toInt();
-      raf.writeStringSync('$A   $B   $D\n');
+    raf.writeStringSync('$results');
+  }
+  String A = "";
+  //ログファイルを作成しandroidに保存
+  Future<void>  makeTxtNeighbor(myFile) async {
+    int cnt = 0;
+    print(dataListNeighborLength.length);
+    print(dataListNeighbor.length);
+    for (var i = 0; i < dataListNeighborLength.length; i++) {
+      int dataNumber = dataListNeighborLength[i]*2+1;
+      for (var j = 0; j < dataNumber; j++) {
+        String B = dataListNeighbor.elementAt(j+cnt).toString();
+        A += "$B   ";
+      }
+      A += "\n";
+      cnt = cnt + dataNumber;
     }
+    String logDirectory = await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS);
+    String myFile2 = "Neighbor_$myFile";
+    String logPath = '${logDirectory}/$myFile2';
+    File textFilePath = File(logPath);
+    print('$logPath');
+    var raf = textFilePath.openSync(mode: FileMode.write);
+    raf.writeStringSync('$A');
+    //A = "";
   }
 
   //メイン関数
@@ -229,8 +358,8 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
     _determinePosition();
     for(int i = 1; i < NUM;i++){
       filename = "myhome_dataset$i.txt";
-      await repetition();
-      await makeTxt("myhome_dataset$i.txt");
+      //await repetition(fileName);
+      //await makeTxt("myhome_dataset$i.txt");
     }
   }
 
@@ -238,8 +367,12 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
   void main2(fileName) async{
     _determinePosition();
     print(fileName);
-    await repetition();
+    await repetition(fileName);
+    //await repetition(fileName);
+    //await makeTxt(fileName);
+    //await makeTxtNeighbor(fileName);
     await makeTxt(fileName);
+    await makeTxtNeighbor(fileName);
   }
 
   // デザインWidget
@@ -257,6 +390,28 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
             // スペース
             const SizedBox(
               height: 40,
+            ),
+
+            //経過時間表示
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(5.0),
+              width: 380,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black54),
+              ),
+              child: Text(
+                '  Time   $timecount(s)',
+                //style: Theme.of(context).textTheme.headline4,
+                style: const TextStyle(
+                  fontSize: 26,
+                ),
+              ),
+            ),
+
+            // スペース
+            const SizedBox(
+              height: 20,
             ),
 
             //スループット表示
@@ -281,7 +436,7 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
               height: 20,
             ),
 
-            //緯度表示
+            //RSSI表示
             Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.all(5.0),
@@ -290,7 +445,7 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
                 border: Border.all(color: Colors.black54),
               ),
               child: Text(
-                '  Latitude  $Latitude',
+                '  RSSI  $RSSI',
                 //style: Theme.of(context).textTheme.headline4,
                 style: const TextStyle(
                   fontSize: 28,
@@ -303,7 +458,7 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
               height: 20,
             ),
 
-            //経度表示
+            //RSRP表示
             Container(
               alignment: Alignment.center,
               padding: const EdgeInsets.all(5.0),
@@ -312,7 +467,29 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
                 border: Border.all(color: Colors.black54),
               ),
               child: Text(
-                '  Longitude  $Longitude',
+                '  RSRP  $RSRP',
+                //style: Theme.of(context).textTheme.headline4,
+                style: const TextStyle(
+                  fontSize: 28,
+                ),
+              ),
+            ),
+
+            // スペース
+            const SizedBox(
+              height: 20,
+            ),
+
+            //SINR表示
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(5.0),
+              width: 380,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black54),
+              ),
+              child: Text(
+                '  SINR  $SINR',
                 //style: Theme.of(context).textTheme.headline4,
                 style: const TextStyle(
                   fontSize: 28,
@@ -338,28 +515,6 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
                 //style: Theme.of(context).textTheme.headline4,
                 style: const TextStyle(
                   fontSize: 28,
-                ),
-              ),
-            ),
-
-            // スペース
-            const SizedBox(
-              height: 20,
-            ),
-
-            //経過時間表示
-            Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.all(5.0),
-              width: 380,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.black54),
-              ),
-              child: Text(
-                '  Time   $timecount(s)',
-                //style: Theme.of(context).textTheme.headline4,
-                style: const TextStyle(
-                  fontSize: 26,
                 ),
               ),
             ),
