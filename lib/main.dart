@@ -170,7 +170,6 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
       CellType currentCellInFirstChipNeighbor = cellsResponse.neighboringCellList![i];
       dataListNeighbor.add(currentCellInFirstChipNeighbor.lte!.signalLTE!.rssi!.toDouble());
       dataListNeighbor.add(currentCellInFirstChipNeighbor.lte!.signalLTE!.rsrp!.toDouble());
-      //dataListNeighbor.add(currentCellInFirstChipNeighbor.lte!.signalLTE!.snr!.toDouble());
     }
   }
 
@@ -318,7 +317,6 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
       results += "$F   ";
       double H = dataList.elementAt(6*i+5);
       results += "$H   ";
-      //raf.writeStringSync('$results\n');
       results +="\n";
     }
     String logDirectory = await ExternalPath.getExternalStoragePublicDirectory(ExternalPath.DIRECTORY_DOWNLOADS);
@@ -350,7 +348,6 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
     print('$logPath');
     var raf = textFilePath.openSync(mode: FileMode.write);
     raf.writeStringSync('$A');
-    //A = "";
   }
 
   //メイン関数
@@ -358,8 +355,6 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
     _determinePosition();
     for(int i = 1; i < NUM;i++){
       filename = "myhome_dataset$i.txt";
-      //await repetition(fileName);
-      //await makeTxt("myhome_dataset$i.txt");
     }
   }
 
@@ -368,9 +363,6 @@ class _MyHomePageState extends State<MyHomePage> { //_MyHomePageメソッド
     _determinePosition();
     print(fileName);
     await repetition(fileName);
-    //await repetition(fileName);
-    //await makeTxt(fileName);
-    //await makeTxtNeighbor(fileName);
     await makeTxt(fileName);
     await makeTxtNeighbor(fileName);
   }
