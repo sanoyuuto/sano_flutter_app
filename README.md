@@ -24,3 +24,6 @@
 
 ## 結果1
 <img src=https://github.com/sanoyuuto/sano_flutter_app/blob/master/Neighbor_RSSI.png />
+
+## 結果2
+<img src=https://github.com/sanoyuuto/sano_flutter_app/blob/master/Neighbor_RSRP.png />
