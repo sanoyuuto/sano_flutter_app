@@ -15,7 +15,6 @@
 <img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/screen2.jpg" width="50%" /><br>
 
 ## 画像3
-プライバシー保護のため、セルID、緯度、経度を削除したものをアップロードしております。<br>
 <img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/data1.png" width="50%" />
 
 ## 画像4
