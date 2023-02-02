@@ -10,8 +10,7 @@
 #### ⑥それぞれの時間におけるスループットやRSSI、RSRPなどの計測結果が確認できます(画像３)<br><br>
 #### ※緑の現在位置を表示ボタンを押すと、現在の位置情報も表示可能です。(画像４)<br>
 ## 画像1
-プライバシー保護のため緯度、経度は隠しております。<br>
-<img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/screen1.jpg" width="50%" /><br>
+<img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/%E5%9B%B3_new.jpg" width="50%" /><br>
 
 ## 画像2
 <img src="https://github.com/sanoyuuto/sano_flutter_app/blob/master/screen2.jpg" width="50%" /><br>
